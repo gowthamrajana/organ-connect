@@ -1,98 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Organ & Blood Donation Platform</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        h1, h2 {
-            text-align: center;
-        }
-        form {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        input, select, button {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            background: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        .request-card {
-            background: white;
-            padding: 15px;
-            margin-top: 10px;
-            border-radius: 8px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Organ & Blood Donation Platform</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: auto;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    form, .tracker {
+      background: white;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .request-card {
+      background: white;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .status {
+      margin-top: 5px;
+      font-weight: bold;
+      color: green;
+    }
+  </style>
 </head>
 <body>
 
-    <h1>Organ & Blood Donation Platform</h1>
+  <h1>Organ & Blood Donation Platform</h1>
 
-    <form id="donationForm">
-        <input type="text" id="name" placeholder="Name" required>
-        <input type="text" id="bloodType" placeholder="Blood Type / Organ Needed" required>
-        <input type="text" id="location" placeholder="Location" required>
-        <select id="urgency">
-            <option value="Normal">Normal</option>
-            <option value="Emergency">Emergency</option>
-        </select>
-        <button type="submit">Submit Request</button>
-    </form>
+  <!-- Form for New Request -->
+  <form id="donationForm">
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="text" id="bloodType" placeholder="Blood Type / Organ Needed" required>
+    <input type="text" id="location" placeholder="Location" required>
+    <select id="urgency">
+      <option value="Normal">Normal</option>
+      <option value="Emergency">Emergency</option>
+    </select>
+    <button type="submit">Submit Request</button>
+  </form>
 
-    <h2>Active Requests</h2>
-    <div id="requestsList"></div>
+  <!-- Tracking Section -->
+  <div class="tracker">
+    <h2>Track Your Request</h2>
+    <input type="text" id="trackInput" placeholder="Enter Name or Organ to Track">
+    <button onclick="trackRequest()">Track</button>
+    <div id="trackResult"></div>
+  </div>
 
-    <script>
-        document.getElementById("donationForm").addEventListener("submit", function(event) {
-            event.preventDefault();
+  <h2>Active Requests</h2>
+  <div id="requestsList"></div>
 
-            // Get user input values
-            let name = document.getElementById("name").value;
-            let bloodType = document.getElementById("bloodType").value;
-            let location = document.getElementById("location").value;
-            let urgency = document.getElementById("urgency").value;
+  <script>
+    const requests = [];
 
-            // Calculate estimated delivery time
-            let baseTime = Math.floor(Math.random() * 5) + 1; // Simulated time in hours
-            let deliveryTime = (urgency === "Emergency") ? `${baseTime} hours (Prioritized)` : `${baseTime + 2} hours`;
+    document.getElementById("donationForm").addEventListener("submit", function(event) {
+      event.preventDefault();
 
-            // Create new request entry
-            let requestEntry = document.createElement("div");
-            requestEntry.classList.add("request-card");
-            requestEntry.innerHTML = `
-                <p><strong>Name:</strong> ${name}</p>
-                <p><strong>Blood Type / Organ:</strong> ${bloodType}</p>
-                <p><strong>Location:</strong> ${location}</p>
-                <p><strong>Urgency:</strong> ${urgency}</p>
-                <p><strong>Estimated Delivery Time:</strong> ${deliveryTime}</p>
-            `;
+      const name = document.getElementById("name").value;
+      const bloodType = document.getElementById("bloodType").value;
+      const location = document.getElementById("location").value;
+      const urgency = document.getElementById("urgency").value;
 
-            // Append new request to the list
-            document.getElementById("requestsList").appendChild(requestEntry);
+      const baseTime = Math.floor(Math.random() * 5) + 1;
+      const deliveryTime = urgency === "Emergency" ? `${baseTime} hours (Prioritized)` : `${baseTime + 2} hours`;
 
-            // Clear the form
-            document.getElementById("donationForm").reset();
-        });
-    </script>
+      const requestData = {
+        name,
+        bloodType,
+        location,
+        urgency,
+        deliveryTime,
+        matched: false
+      };
+
+      requests.push(requestData);
+      renderRequests();
+      this.reset();
+    });
+
+    function renderRequests() {
+      const container = document.getElementById("requestsList");
+      container.innerHTML = "";
+
+      requests.forEach((req, index) => {
+        const card = document.createElement("div");
+        card.classList.add("request-card");
+        card.innerHTML = `
+          <p><strong>Name:</strong> ${req.name}</p>
+          <p><strong>Blood Type / Organ:</strong> ${req.bloodType}</p>
+          <p><strong>Location:</strong> ${req.location}</p>
+          <p><strong>Urgency:</strong> ${req.urgency}</p>
+          <p><strong>Estimated Delivery Time:</strong> ${req.deliveryTime}</p>
+          <button onclick="markAsMatched(${index})">${req.matched ? "Matched ✅" : "Mark as Matched"}</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function markAsMatched(index) {
+      requests[index].matched = true;
+      renderRequests();
+    }
+
+    function trackRequest() {
+      const query = document.getElementById("trackInput").value.trim().toLowerCase();
+      const result = requests.find(req =>
+        req.name.toLowerCase() === query || req.bloodType.toLowerCase() === query
+      );
+
+      const resultDiv = document.getElementById("trackResult");
+      if (result) {
+        resultDiv.innerHTML = `
+          <div class="request-card">
+            <p><strong>Name:</strong> ${result.name}</p>
+            <p><strong>Blood Type / Organ:</strong> ${result.bloodType}</p>
+            <p><strong>Status:</strong> ${result.matched ? "<span class='status'>Match Found ✅</span>" : "Searching..."}</p>
+          </div>
+        `;
+      } else {
+        resultDiv.innerHTML = `<p>No matching request found.</p>`;
+      }
+    }
+  </script>
 
 </body>
 </html>
+
