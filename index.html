@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organ & Blood Donation Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .request-card {
+            background: white;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Organ & Blood Donation Platform</h1>
+
+    <form id="donationForm">
+        <input type="text" id="name" placeholder="Name" required>
+        <input type="text" id="bloodType" placeholder="Blood Type / Organ Needed" required>
+        <input type="text" id="location" placeholder="Location" required>
+        <select id="urgency">
+            <option value="Normal">Normal</option>
+            <option value="Emergency">Emergency</option>
+        </select>
+        <button type="submit">Submit Request</button>
+    </form>
+
+    <h2>Active Requests</h2>
+    <div id="requestsList"></div>
+
+    <script>
+        document.getElementById("donationForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            // Get user input values
+            let name = document.getElementById("name").value;
+            let bloodType = document.getElementById("bloodType").value;
+            let location = document.getElementById("location").value;
+            let urgency = document.getElementById("urgency").value;
+
+            // Calculate estimated delivery time
+            let baseTime = Math.floor(Math.random() * 5) + 1; // Simulated time in hours
+            let deliveryTime = (urgency === "Emergency") ? `${baseTime} hours (Prioritized)` : `${baseTime + 2} hours`;
+
+            // Create new request entry
+            let requestEntry = document.createElement("div");
+            requestEntry.classList.add("request-card");
+            requestEntry.innerHTML = `
+                <p><strong>Name:</strong> ${name}</p>
+                <p><strong>Blood Type / Organ:</strong> ${bloodType}</p>
+                <p><strong>Location:</strong> ${location}</p>
+                <p><strong>Urgency:</strong> ${urgency}</p>
+                <p><strong>Estimated Delivery Time:</strong> ${deliveryTime}</p>
+            `;
+
+            // Append new request to the list
+            document.getElementById("requestsList").appendChild(requestEntry);
+
+            // Clear the form
+            document.getElementById("donationForm").reset();
+        });
+    </script>
+
+</body>
+</html>
